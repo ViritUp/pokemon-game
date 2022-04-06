@@ -1,38 +1,116 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
+
 canvas.width = 1024;
 canvas.height = 576;
 
-c.fillStyle = '#fff';
-c.fillRect(0, 0, canvas.width, canvas.height);
+// create collisions 
+const collisionsMap = [];
+for (let i = 0; i < collisions.length; i += 70) {
+  collisionsMap.push(collisions.slice(i, 70 + i));
+}
+
+const battleZonesMap = [];
+for (let i = 0; i < battleZonesData.length; i += 70) {
+  battleZonesMap.push(battleZonesData.slice(i, 70 + i));
+}
+
+console.log(battleZonesMap);
+
+const boundaries = [];
+const offset = {
+  x: -735,
+  y: -620
+};
+
+collisionsMap.forEach((row, i) => {
+  row.forEach((symbol, j) => {
+    if(symbol === 1025 ) {
+      boundaries.push(
+        new Boundary({
+          position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y
+          }
+        })
+      );
+    }
+  });
+}) ;
+
+const battleZones = [];
+
+battleZonesMap.forEach((row, i) => {
+  row.forEach((symbol, j) => {
+    if(symbol === 1025 ) {
+      battleZones.push(
+        new Boundary({
+          position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y
+          }
+        })
+      );
+    }
+  });
+}) ;
+
+console.log(battleZones);
 
 const image = new Image();             //создаем изображение карты
 image.src = 'img/town.png';
 
-const playerImage = new Image();       //создаем изображение игрока
-playerImage.src = 'img/playerDown.png';
+const foregroundImage = new Image();         
+foregroundImage.src = 'img/foreground.png';
 
-class Sprite {
-    constructor({position, velocity, image}) {
-        this.position = position;
-        this.image = image;
-    }
+const playerDownImage = new Image();       //создаем изображение игрока
+playerDownImage.src = 'img/playerDown.png';
+const playerUpImage = new Image();       //создаем изображение игрока
+playerUpImage.src = 'img/playerUp.png';
+const playerLeftImage = new Image();       //создаем изображение игрока
+playerLeftImage.src = 'img/playerLeft.png';
+const playerRightImage = new Image();       //создаем изображение игрока
+playerRightImage.src = 'img/playerRight.png';
 
-    draw() {
-        c.drawImage(this.image, this.position.x, this.position.y);
-    }
-}
 
-const background = new Sprite({
+
+
+const player = new Sprite({
+  position: {
+    x: canvas.width / 2 - 192 / 4 / 2,
+    y: canvas.height / 2 - 68 / 2,
+  },
+  image: playerDownImage,
+  frames: {
+    max: 4
+  },
+  sprites: {
+    up: playerUpImage,
+    left: playerLeftImage,
+    right: playerRightImage,
+    down: playerDownImage,
+
+  }
+});
+
+const background = new Sprite({        // создание карты
     position: {
-    x: -800,
-    y: -645
+    x: offset.x,
+    y: offset.y
     }, 
     image: image
 });
 
-const keys = {
+const foreground = new Sprite({        // создание карты
+    position: {
+    x: offset.x,
+    y: offset.y
+    }, 
+    image: foregroundImage
+});
+
+const keys = {          // нажатые кнопки
     w: {
         pressed: false
     },
@@ -45,33 +123,142 @@ const keys = {
     d: {
         pressed: false
     }
-}
+};
 
+const movables = [background, ...boundaries, foreground, ...battleZones];
+function rectangularCollision({rectangle1, rectangle2}) {
+  return (
+    rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+    rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+    rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
+    rectangle1.position.y + rectangle1.height >= rectangle2.position.y
+  )
+}
 function animate() {
-    background.draw();
-    window.requestAnimationFrame(animate);      //рисуем карту
-    c.drawImage(                   //рисуем игрока
-        playerImage, 
-        0,                         // обрезаем картинку (4 аргумента)
-        0,
-        playerImage.width / 4,         
-        playerImage.height,
-        canvas.width / 2 - playerImage.width / 4 / 2, 
-        canvas.height / 2 - playerImage.height / 2,
-        playerImage.width / 4,   
-        playerImage.height
-    );
-    
-    if(keys.w.pressed && lastKey === 'w') background.position.y += 3;
-    else if(keys.d.pressed && lastKey === 'd')  background.position.x -= 3;
-    else if(keys.s.pressed && lastKey === 's') background.position.y -= 3;
-    else if(keys.a.pressed && lastKey === 'a') background.position.x += 3;
+  window.requestAnimationFrame(animate);      
+  background.draw();                      //рисуем карту
+  boundaries.forEach(boundary => {
+    boundary.draw();
+  });
+  battleZones.forEach(battleZone => {
+    battleZone.draw();
+  });
+  player.draw();
+  foreground.draw();
+
+  if (keys.w.pressed || keys.d.pressed || keys.a.pressed || keys.s.pressed) {
+    for(let i = 0; i < battleZones.length; i++) {
+      const battleZone = battleZones[i];
+      if(rectangularCollision({
+        rectangle1: player, 
+        rectangle2: battleZone
+      })
+      ) {
+        console.log('battle zone');
+        break;
+      }
+    }
+  }
+
+
+  let moving = true;
+  // Перемещение 
+  player.moving = false;
+  if(keys.w.pressed && lastKey === 'w') {
+    player.moving = true;
+    player.image = player.sprites.up;
+    for(let i = 0; i < boundaries.length; i++) {
+      const boundary = boundaries[i];
+      if(rectangularCollision({
+        rectangle1: player, 
+        rectangle2: {...boundary, position: {
+          x: boundary.position.x,
+          y: boundary.position.y + 3
+        }}
+      })
+      ) {
+        moving = false;
+        break;
+      }
+    }
+
+  
+    if(moving) {
+      movables.forEach(movable => {movable.position.y += 3;});
+    }
+  }
+  else if(keys.d.pressed && lastKey === 'd')  {
+      player.moving = true;
+      player.image = player.sprites.right;
+      for(let i = 0; i < boundaries.length; i++) {
+      const boundary = boundaries[i];
+      if(rectangularCollision({
+        rectangle1: player, 
+        rectangle2: {...boundary, position: {
+          x: boundary.position.x - 3,
+          y: boundary.position.y
+        }}
+      })
+      ) {
+        moving = false;
+        break;
+      }
+    }
+   
+    if(moving) {
+      movables.forEach(movable => {movable.position.x -= 3;});
+    }
+  }
+  else if(keys.s.pressed && lastKey === 's') {
+    player.moving = true;
+    player.image = player.sprites.down;
+    for(let i = 0; i < boundaries.length; i++) {
+    const boundary = boundaries[i];
+    if(rectangularCollision({
+      rectangle1: player, 
+      rectangle2: {...boundary, position: {
+        x: boundary.position.x,
+        y: boundary.position.y - 3
+      }}
+    })
+    ) {
+      moving = false;
+      break;
+    }
+  }
+ 
+  if(moving) {
+    movables.forEach(movable => {movable.position.y -= 3;});
+  }
+  }
+  else if(keys.a.pressed && lastKey === 'a') {
+    player.moving = true;
+    player.image = player.sprites.left;
+    for(let i = 0; i < boundaries.length; i++) {
+      const boundary = boundaries[i];
+      if(rectangularCollision({
+        rectangle1: player, 
+        rectangle2: {...boundary, position: {
+          x: boundary.position.x + 3,
+          y: boundary.position.y
+        }}
+      })
+      ) {
+        moving = false;
+        break;
+      }
+    }
+   
+    if(moving) {
+      movables.forEach(movable => {movable.position.x += 3;});
+    }
+  }
 }
 
 animate();
 
-let lastKey = '';
-window.addEventListener('keydown', (e) => {
+let lastKey = '';      
+window.addEventListener('keydown', (e) => {    // нажатая кнопка
     switch(e.key) {
         case 'w':
             keys.w.pressed = true;
@@ -92,7 +279,7 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-window.addEventListener('keyup', (e) => {
+window.addEventListener('keyup', (e) => {     // отжатая кнопка
     switch(e.key) {
         case 'w':
             keys.w.pressed = false;
@@ -108,3 +295,11 @@ window.addEventListener('keyup', (e) => {
             break;
     }
 });
+
+
+
+
+
+
+
+/* 3.05.0 */
