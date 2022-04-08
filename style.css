@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background-color: #000;
     display: flex;
@@ -7,4 +15,105 @@ body {
     align-items: center;
     overflow: hidden;
     margin: 0;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.canvas{
+    position: absolute;
+    background-color: #000;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.canvas-wrapper{
+    display: inline-block;
+    position: relative;
+}
+
+#attack-inner{
+    background-color: #fff;
+    width: 100%;
+    height: 140px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-top: 4px solid #000;
+    display: flex;
+}
+
+#attack{
+    width: 66.66%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+#attack-info{
+    width: 33.33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-left: 4px solid #000;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+button:hover {
+    background-color: #ccc;
+}
+
+h1 {
+    font-size: 16px;
+}
+
+#health{
+    background-color: #fff;
+    width: 250px;
+    padding: 12px;
+    position: absolute;
+    border: 3px solid #000;
+}
+
+#health h1 {
+    font-size: 16px;
+}
+
+.health-draggle{
+    top: 50px;
+    left: 50px;
+}
+
+.health-emby{
+    top: 330px;
+    right: 50px;
+}
+
+#bar {
+    background-color: #ccc;
+    height: 5px;
+    margin-top: 10px;
+}
+
+#bar-cur{
+    background-color: rgb(0, 113, 0);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    z-index: 10;
+}
+
+.a {
+    position: relative;
+    width: 100%;
 }
