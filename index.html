@@ -11,39 +11,48 @@
     <div class="canvas-wrapper" >
         <div class="canvas" id="overlappingDiv"></div>
 
-        <div id="health" class="health-draggle">
-            <h1>Draggle</h1>
-            <div class="a">
-                <div id="bar" class="bar-draggle"></div>
-                <div id="bar-cur" class="bar-draggle__cur"></div>
-            </div>
-        </div>
-
-        <div id="health" class="health-emby">
-            <h1>Emby</h1>
-            <div class="a">
-                <div id="bar" class="bar-emby"></div>
-                <div id="bar-cur" class="bar-emby__cur"></div>
-            </div>
-        </div>
-
+        
         <canvas></canvas>
-
-        <div id="attack-inner">
-            <div id="attack">
-                <button>Tackle</button>
-                <button>Fire ball</button>
+        <div id="userInterface" style="display: none">
+            <div id="attack-inner">
+                <div id="dialogueBox" class="text">
+                    sdfdsfsd
+                </div>
+                <div id="attack"></div>
+                <div id="attack-info">
+                    <h1 id="attackType">Attack Type</h1>
+                </div>
             </div>
-            <div id="attack-info">
-                <h1>Attack Type</h1>
+    
+            <div id="health" class="health-draggle">
+                <h1>Draggle</h1>
+                <div class="a">
+                    <div id="bar" class="bar-draggle"></div>
+                    <div id="enemyHealthBar" class="bar-draggle__cur"></div>
+                </div>
+            </div>
+    
+            <div id="health" class="health-emby">
+                <h1>Emby</h1>
+                <div class="a">
+                    <div id="bar" class="bar-emby"></div>
+                    <div id="playerHealthBar" class="bar-emby__cur"></div>
+                </div>
             </div>
         </div>
+        
+
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="data/audio.js"></script>
     <script src="data/collisions.js"></script>
     <script src="data/battleZones.js"></script>
+    <script src="data/attacks.js"></script>
+    <script src="data/monsters.js"></script>
     <script src="classes.js"></script>
     <script src="index.js"></script>
+    <script src="battleScene.js"></script>
 </body>
 </html>
